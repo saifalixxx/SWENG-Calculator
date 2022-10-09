@@ -1,20 +1,11 @@
-package org.example;
-
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
-import java.util.Iterator;
 
-public class Temp
-{
-
-    public static int calculate(String expression) {
-		char[] expressionArray = expression.toCharArray();
+public class Calculator {
+	public static int calculate(char[] expressionArray) {
 		Stack<Integer> numStack = new Stack<Integer>();
 		Stack<Character> operStack = new Stack<Character>();
 		for (int i = 0; i < expressionArray.length; i++) {
-			boolean invalid;
 			if (expressionArray[i] == ' ') {
 				continue;
 			} else if (expressionArray[i] >= '0' && expressionArray[i] <= '9') {
@@ -30,13 +21,6 @@ public class Temp
 				operStack.pop();
 			} else if (expressionArray[i] == '+' || expressionArray[i] == '-' || expressionArray[i] == '*'
 					|| expressionArray[i] == '/') {
-				// check if next char is an operator as well
-				int j = i + 1;
-				if (expressionArray[j] == '+' || expressionArray[j] == '-' || expressionArray[j] == '*'
-						|| expressionArray[j] == '/') {
-					invalid = true;
-					break;
-				}
 				while (!operStack.empty() && hasPrecedence(expressionArray[i], operStack.peek()))
 					numStack.push(applyOperation(operStack.pop(), numStack.pop(), numStack.pop()));
 				operStack.push(expressionArray[i]);
@@ -45,7 +29,6 @@ public class Temp
 						&& (expressionArray[i] != '+' || expressionArray[i] != '-' || expressionArray[i] != '*'
 								|| expressionArray[i] != '/'))
 					continue;
-				invalid = true;
 			}
 		}
 
@@ -75,10 +58,34 @@ public class Temp
 		return 0;
 	}
 
+	public static boolean checkInvalid(String num) {
+		boolean invalid = false;
+		invalid = num.matches(".*[a-zA-Z].*");
+		char[] expressionArray = num.toCharArray();
+		for (int i = 0; i < expressionArray.length; i++) {
+			if (expressionArray[i] == '+' || expressionArray[i] == '-' || expressionArray[i] == '*') {
+				if (expressionArray[i + 1] == '+' || expressionArray[i + 1] == '-' || expressionArray[i + 1] == '*') {
+					invalid = true;
+				} else
+					continue;
+			}
+		}
+		return invalid;
+	}
+
 	public static void main(String[] args) {
 		System.out.print("Please enter a valid expression to calculate : ");
-        Scanner input = new Scanner(System.in);
-        String exp = input.nextLine();
-		System.out.println(calculate(exp));
+		Scanner input = new Scanner(System.in);
+		String num = input.nextLine();
+		if (num == null) {
+			System.out.print("Please enter a valid expression to calculate : ");
+			input = new Scanner(System.in);
+		}
+		if (checkInvalid(num)) {
+			System.out.println("Invalid");
+			System.exit(1);
+		}
+		char[] expressionArray = num.toCharArray();
+		System.out.println(calculate(expressionArray));
 	}
 }
